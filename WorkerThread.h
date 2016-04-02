@@ -7,19 +7,19 @@
 #pragma once
 
 #include "SpinMutex.h"
+#include "TaskQueue.h"
+#include "Types.h"
+
 #include <atomic>
 #include <thread>
 #include <vector>
 
 namespace parallel {
 
-const int MAX_THREADS = 32;
-const int MAX_TASKSPERTHREAD = 256;
-
 struct InternalTask;
 struct TaskPool;
 
-struct TaskCompletion {
+struct CACHELINE_ALIGNED TaskCompletion {
   TaskCompletion() : _busy(0) {}
 
   bool busy() const { return _busy != 0; }
@@ -45,38 +45,37 @@ struct WorkerThread {
   WorkerThread &operator=(const WorkerThread &) = delete;
 
   bool start(TaskPool *pool);
-  void idle();
-
-  void join();
-
   bool attach_to_this_thread(TaskPool *);
 
-  InternalTask *pop_task();
+  void idle();
+  void join();
+
   bool push_task(InternalTask *task);
-  bool push_task_internal(InternalTask *task);
 
   int worker_index() const;
-  uint32_t affinity_mask() const;
 
   void work_until_done(TaskCompletion *);
+
+private:
+  /// Thread entry point.
+  void run();
+
   void do_work(TaskCompletion *);
+
+  bool push_task_internal(InternalTask *task);
 
   bool steal_tasks();
   bool give_up_some_work(WorkerThread *idleThread);
 
-protected:
-  void run();
-
 public:
-  std::vector<InternalTask *> tasks;
   TaskCompletion *current_completion;
-  TaskPool *taskpool;
-
-  spin_mutex task_mutex;
-
   std::atomic<bool> finished;
 
 private:
+  TaskQueue<MAX_TASKSPERTHREAD> tasks;
+  TaskPool *taskpool;
+
   std::thread _thread;
 };
-}
+
+} // namespace parallel

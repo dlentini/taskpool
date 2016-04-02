@@ -3,6 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0.
 // See LICENSE_1_0.txt for details.
 //
+/// \file Simplified async function to "work" like C++11 async.
 
 #pragma once
 
@@ -33,4 +34,5 @@ struct AsyncTask : InternalTask {
 template <class Fn, class... Args> void async(Fn &&fn, Args &&... args) {
   WorkerThread::current()->push_task(new AsyncTask(fn, args...));
 }
-}
+
+} // namespace parallel

@@ -65,4 +65,5 @@ void TaskPool::wake_workers() {
   workers_idle = false;
   wake_up_call.release(_worker_count);
 }
-}
+
+} // namespace parallel

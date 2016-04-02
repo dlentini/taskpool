@@ -8,7 +8,7 @@
 
 #include "WorkerThread.h"
 #include "Semaphore.h"
-#include <vector>
+#include "Types.h"
 #include <atomic>
 
 namespace parallel {
@@ -41,4 +41,5 @@ private:
   int _thread_count;
   int _worker_count;
 };
-}
+
+} // namespace parallel

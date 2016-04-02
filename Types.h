@@ -6,6 +6,13 @@
 
 #pragma once
 
+namespace parallel {
+
 #define FORCE_INLINE inline
 #define CACHELINE_SIZE 16
 #define CACHELINE_ALIGNED alignas(CACHELINE_SIZE)
+
+#define MAX_THREADS 32
+#define MAX_TASKSPERTHREAD 256
+
+} // namespace parallel

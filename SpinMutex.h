@@ -28,17 +28,19 @@ public:
 
 private:
   void aquire() {
-    // while (locked.test_and_set(std::memory_order_acquire));
-    mutex.lock();
+    while (locked.test_and_set(std::memory_order_acquire))
+      ;
+    // mutex.lock();
   }
 
   void release() {
-    // locked.clear(std::memory_order_release);
-    mutex.unlock();
+    locked.clear(std::memory_order_release);
+    // mutex.unlock();
   }
 
 private:
-  // std::atomic_flag locked;
-  std::mutex mutex;
+  std::atomic_flag locked;
+  // std::mutex mutex;
 };
-}
+
+} // namespace parallel
